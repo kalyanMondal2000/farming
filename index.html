@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Underground Farm - Scene View</title>
+  <title>Underground Farm</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -145,6 +145,8 @@
   </div>
 
   <script>
+    import { FBXLoader } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/FBXLoader.js";
+
     const quoteElement = document.getElementById('quoteDisplay');
     const quoteText = `"No kernel of nourishing corn can come to him but through his toil bestowed on that plot of ground which is given to him to till..."\n - Ralph Waldo Emerson\n("Self-Reliance", ll.)`;
     let textIndex = 0;
@@ -217,7 +219,15 @@
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.setPixelRatio(window.devicePixelRatio);
 
+      const loader = new FBXLoader(); 
 
+      loader.load('/house.fbx', (fbx)=>{
+        fbx.scale.set(1,1,1)
+        fbx.position.set(0,0,0)
+        scene.add(fbx)
+      }, (error)=>{
+        console.log(error)
+      })
     }
 
     function onWindowResize() {
