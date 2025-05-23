@@ -131,7 +131,7 @@
   <canvas id="sceneCanvas"></canvas>
   <div id="quoteDisplay"></div>
   <h1 class="game-title">Underground Farm</h1>
-  <button class="start-button">View Scene</button>
+  <button class="start-button">Start Game</button>
   <div class="scroll-prompt">
     <div class="arrow"></div>
     Scroll Down
@@ -146,13 +146,12 @@
 
   <script>
     const quoteElement = document.getElementById('quoteDisplay');
-    const quoteText = `"No kernel of nourishing corn can come to him but through his toil bestowed on that plot of ground which is given to him to till..." - Ralph Waldo Emerson`;
+    const quoteText = `"No kernel of nourishing corn can come to him but through his toil bestowed on that plot of ground which is given to him to till..."\n - Ralph Waldo Emerson\n("Self-Reliance", ll.)`;
     let textIndex = 0;
     const typingSpeed = 80;
 
     const gameTitle = document.querySelector('.game-title');
     const startButtonElement = document.querySelector('.start-button');
-    const scrollPrompt = document.querySelector('.scroll-prompt');
     const gameDescription = document.getElementById('gameDescription');
     const hoverSpeed = '0.7s';
     let descriptionVisible = false;
@@ -167,25 +166,12 @@
       } else {
         gameTitle.style.display = 'block';
         startButtonElement.style.display = 'block';
-        scrollPrompt.style.display = 'block';
-        setupScrollListener();
+        
+        
         void gameTitle.offsetWidth;
         void startButtonElement.offsetWidth;
         gameTitle.classList.add('animate-in');
         startButtonElement.classList.add('animate-in');
-      }
-    }
-
-    function setupScrollListener() {
-      window.addEventListener('scroll', handleScroll);
-    }
-
-    function handleScroll() {
-      if (!descriptionVisible && window.scrollY > 50) {
-        gameDescription.classList.add('description-visible');
-        descriptionVisible = true;
-        scrollPrompt.style.display = 'none';
-        window.removeEventListener('scroll', handleScroll);
       }
     }
 
@@ -198,10 +184,8 @@
       quoteElement.style.display = 'none';
       startButton.style.display = 'none';
       gameTitle.style.display = 'none';
-      scrollPrompt.style.display = 'none';
       gameDescription.classList.remove('description-visible');
       descriptionVisible = false;
-      window.removeEventListener('scroll', handleScroll);
       canvas.style.display = 'block';
       init();
       animate();
@@ -212,7 +196,7 @@
 
     function init() {
       scene = new THREE.Scene();
-      scene.background = new THREE.Color('black');
+      scene.background = new THREE.Color('grey');
 
       camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
       camera.position.set(35, 10, 0);
@@ -233,31 +217,7 @@
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.setPixelRatio(window.devicePixelRatio);
 
-     
-      const loader = new THREE.TextureLoader();
-      const grassTexture = loader.load('/blade_alpha.jpg');
-      grassTexture.wrapS = grassTexture.wrapT = THREE.RepeatWrapping;
-      grassTexture.repeat.set(50, 50);
 
-      const grassNormal = loader.load('/blade_diffuse.jpg');
-      grassNormal.wrapS = grassNormal.wrapT = THREE.RepeatWrapping;
-      grassNormal.repeat.set(50, 50);
-
-      const grassMaterial = new THREE.MeshStandardMaterial({
-        map: grassTexture,
-        normalMap: grassNormal,
-      });
-
-      const grassGeometry = new THREE.PlaneGeometry(500, 500, 100, 100);
-      grass = new THREE.Mesh(grassGeometry, grassMaterial);
-      grass.rotation.x = -Math.PI / 2;
-      grass.position.y = 0.05;
-      scene.add(grass);
-
-      // Other objects (house, bed, table, ladder)... [unchanged]
-      // (You can insert your existing house/bed/table/ladder creation code here)
-
-      window.addEventListener('resize', onWindowResize);
     }
 
     function onWindowResize() {
@@ -269,16 +229,6 @@
     function animate() {
       requestAnimationFrame(animate);
       time += 0.01;
-
-      const position = grass.geometry.attributes.position;
-      for (let i = 0; i < position.count; i++) {
-        const x = position.getX(i);
-        const z = position.getZ(i);
-        const y = Math.sin((x + time * 10) * 0.05) * 0.2 + Math.cos((z + time * 10) * 0.05) * 0.2;
-        position.setY(i, y);
-      }
-      position.needsUpdate = true;
-      grass.geometry.computeVertexNormals();
 
       renderer.render(scene, camera);
     }
