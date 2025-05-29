@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Serif:wght@400;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mea+Culpa&display=swap" />
+<link href="https://fonts.googleapis.com/css2?family=Tangerine:wght@400;700&display=swap" rel="stylesheet">
 <style>
 body {
   font-family: 'Noto Serif', serif;
@@ -42,6 +43,79 @@ body {
   max-width: 80%;
   position: relative;
   z-index: 1;
+}
+
+/* NEW: Message Container */
+#messageContainer {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex; /* Use flexbox to stack messages */
+  flex-direction: column; /* Stack vertically */
+  align-items: center; /* Center horizontally */
+  max-width: 90%;
+  box-sizing: border-box;
+  padding-top: 25px; /* Added extra padding to push text down from the very top edge */
+}
+
+#messageDisplay {
+  font-family: 'Tangerine', cursive;
+  font-size: 3em;
+  color: #FFFFFF;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 20px 30px;
+  border-radius: 0 0 10px 10px;
+  text-align: center;
+  display: none; /* Initially hidden */
+  box-sizing: border-box;
+  margin-bottom: 10px; /* Space between messages */
+}
+
+/* NEW: Controls Message Display */
+#controlsMessageDisplay {
+  font-family: 'Press Start 2P', cursive; /* Using a more game-like font */
+  font-size: 1em; /* Adjust size as needed */
+  color: #ADD8E6; /* Light blue color */
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 10px 20px;
+  border-radius: 5px;
+  text-align: center;
+  display: none; /* Initially hidden */
+  max-width: 90%;
+  box-sizing: border-box;
+}
+
+#cultivateMessageDisplay {
+  font-family: 'Press Start +2P', cursive; /* A more game-like font */
+  font-size: 1.2em;
+  color: #ADD8E6; /* Light blue color */
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 15px 25px;
+  border-radius: 10px;
+  text-align: center;
+  position: absolute;
+  bottom: 20px; /* Position at the bottom */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1001; /* Higher than other UI elements */
+  display: none; /* Initially hidden */
+  max-width: 80%;
+  box-sizing: border-box;
+}
+#cornCounterDisplay {
+  font-family: 'Press Start 2P', cursive; /* A more game-like font */
+  font-size: 1.5em;
+  color: #7CFC00; /* Green for corn */
+  position: absolute;
+  top: 20px; /* Top left */
+  left: 20px;
+  z-index: 1001;
+  display: none; /* Changed to none, will be block after game start */
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 10px 15px;
+  border-radius: 5px;
 }
 .game-title {
   font-family: 'Mea Culpa', cursive;
@@ -154,17 +228,20 @@ body {
 <body>
 <canvas id="sceneCanvas"></canvas>
 <div id="quoteDisplay"></div>
+
+<div id="messageContainer">
+  <div id="messageDisplay"></div>
+  <div id="controlsMessageDisplay"></div>
+</div>
+
+<div id="cultivateMessageDisplay"></div>
+<div id="cornCounterDisplay">Corn: 0</div>
 <h1 class="game-title">Underground Farm</h1>
 <button class="start-button">Start Game</button>
 <div class="scroll-prompt">
   <div class="arrow"></div>
   Scroll Down
   <div class="arrow" style="transform: rotate(180deg); margin-top: 5px; margin-bottom: 0;"></div>
-</div>
-<div id="gameDescription">
-<h2>About Underground Farm</h2>
-<p>Embark on a unique farming adventure deep beneath the surface! In Underground Farm, you'll cultivate strange and wonderful crops in the subterranean world. Manage your resources, expand your underground farm, and discover the secrets hidden in the depths.</p>
-<p>Explore different layers, encounter peculiar creatures, and trade your harvests.</p>
 </div>
 <button id="skipButton">Skip Animation</button>
 <script type="module">
@@ -212,9 +289,15 @@ const minX = -40; // Minimum X coordinate
 const maxX = 65;  // Maximum X coordinate
 
 const quoteElement = document.getElementById('quoteDisplay');
+const messageDisplay = document.getElementById('messageDisplay'); // Get the top message display element
+const controlsMessageDisplay = document.getElementById('controlsMessageDisplay'); // NEW: Get the controls message display element
+const cultivateMessageDisplay = document.getElementById('cultivateMessageDisplay'); // Get the new cultivate message display element
+const cornCounterDisplay = document.getElementById('cornCounterDisplay'); // Get the new corn counter display element
+
 const quoteText = `"No kernel of nourishing corn can come to him but through his toil bestowed on that plot of ground which is given to him to till..."
  - Ralph Waldo Emerson
-("Self-Reliance", p.128)`;
+("Self-Reliance", p.128)
+Live the life of the underground man. Cultivate his corn, discover his apartment, and view St. Petersburg from his perspective.`;
 let textIndex = 0;
 const typingSpeed = 80;
 let typingTimeout;
@@ -225,6 +308,8 @@ const skipBtn = document.getElementById('skipButton');
 
 const hoverSpeed = '0.7s';
 document.documentElement.style.setProperty('--hover-speed', hoverSpeed);
+
+let cornCount = 0; // Initialize corn counter
 
 function typeWriter() {
   if (textIndex < quoteText.length) {
@@ -260,8 +345,9 @@ startButton.addEventListener('click', () => {
   quoteElement.style.display = 'none';
   startButton.style.display = 'none';
   gameTitle.style.display = 'none';
-  document.getElementById('gameDescription').style.display = 'none';
+  
   document.getElementById('sceneCanvas').style.display = 'block';
+  cornCounterDisplay.style.display = 'block'; // Make corn counter visible on game start
 
   init();
   addEventListeners();
@@ -357,7 +443,7 @@ sky.material.uniforms['sunPosition'].value.copy(sun);
   const gltfLoader = new GLTFLoader();
 
   try{
-    const glb = await gltfLoader.loadAsync('/bed.glb')
+    const glb = await gltfLoader.loadAsync('/models/bed.glb')
     let bed = glb.scene
     bed.scale.setScalar(8)
     bed.position.set(90, 32, -230)
@@ -368,7 +454,7 @@ sky.material.uniforms['sunPosition'].value.copy(sun);
   }
 
   try{
-    const glb = await gltfLoader.loadAsync('/corn.glb')
+    const glb = await gltfLoader.loadAsync('/models/corn.glb')
     const originalCorn = glb.scene;
     const cornScale = new THREE.Vector3(0.2, 0.4, 0.2); // Define the desired scale for all corn models
 
@@ -400,7 +486,7 @@ sky.material.uniforms['sunPosition'].value.copy(sun);
     console.log(e)
   }
   try {
-    const house = await fbxLoader.loadAsync('/houseFinal.fbx');
+    const house = await fbxLoader.loadAsync('/models/houseFinal.fbx');
     house.scale.set(0.125, 0.125, 0.125);
     house.position.set(0, -50, -200);
     house.traverse((node) => { if (node.isMesh) node.castShadow = true; }); // Cast shadows for house
@@ -410,7 +496,7 @@ sky.material.uniforms['sunPosition'].value.copy(sun);
   }
 
   try {
-    const glb = await gltfLoader.loadAsync('/undergroundMan.glb');
+    const glb = await gltfLoader.loadAsync('/models/undergroundMan.glb');
     originalMan = glb.scene;
 
     man = SkeletonUtils.clone(originalMan);
@@ -438,21 +524,21 @@ sky.material.uniforms['sunPosition'].value.copy(sun);
     }
 
     try{
-      const glb = await gltfLoader.loadAsync('/street.glb');
+      const glb = await gltfLoader.loadAsync('/models/street.glb');
       let road = glb.scene
       road.scale.setScalar(140,100,300);
       road.position.set(0,-35,-240)
       road.receiveShadow = true; // Roads should receive shadows
       scene.add(road)
 
-    const glb1= await gltfLoader.loadAsync('/street.glb');
+    const glb1= await gltfLoader.loadAsync('/models/street.glb');
        let road1 = glb1.scene
       road1.scale.setScalar(140,100,300);
       road1.position.set(-100,-35,-240)
       road1.receiveShadow = true;
       scene.add(road1)
 
-      const glb2= await gltfLoader.loadAsync('/street.glb');
+      const glb2= await gltfLoader.loadAsync('/models/street.glb');
       let road2 = glb2.scene
       road2.scale.setScalar(140,100,300);
       road2.position.set(100,-35,-240)
@@ -496,7 +582,7 @@ sky.material.uniforms['sunPosition'].value.copy(sun);
       let house = glb.scene; // Access the scene property of the loaded GLB
       house.scale.setScalar(scale);
       house.position.set(x, y, z);
-      house.rotation.y = angle; 
+      house.rotation.y = angle;
       house.traverse((node) => {
         if (node.isMesh) node.castShadow = true;
       }); // Ensure the loaded model casts shadows
@@ -505,11 +591,11 @@ sky.material.uniforms['sunPosition'].value.copy(sun);
   };
 
 
-loadHouse(0,-30,-340, 'building2.glb',20,0)
-loadHouse(-180,-30,-300, 'building1.glb',20,Math.PI/2)
-loadHouse(-180,-30,-200, 'building1.glb',20,Math.PI/2)
-loadHouse(-140,-30,-340, 'building3.glb',20,0)
-loadHouse(200,-30,-280, 'building2.glb',20,Math.PI/2)
+loadHouse(0,-30,-340, '/modelsbuilding2.glb',20,0)
+loadHouse(-180,-30,-300, '/models/building1.glb',20,Math.PI/2)
+loadHouse(-180,-30,-200, '/models/building1.glb',20,Math.PI/2)
+loadHouse(-140,-30,-340, '/models/building3.glb',20,0)
+loadHouse(200,-30,-280, '/models/building2.glb',20,Math.PI/2)
 
 
   function createLamp(x, y, z) {
@@ -542,6 +628,9 @@ loadHouse(200,-30,-280, 'building2.glb',20,Math.PI/2)
   createLamp(man.position.x - 10, man.position.y + 80, man.position.z - 10);
 
   mixer.addEventListener('finished', onInteractionFinished);
+
+  // Set initial corn counter display
+  cornCounterDisplay.textContent = `Corn: ${cornCount}`;
 
   animate();
 }
@@ -595,6 +684,11 @@ function addEventListeners() {
             if (actions.SwordSlash && controls.current !== 'SwordSlash') {
                 setAnimation('SwordSlash');
             }
+            // Check for corn cultivation only if cultivate message is active
+            if (man && man.position.x < -34 && cultivateMessageDisplay.style.display === 'block') {
+                cornCount++;
+                cornCounterDisplay.textContent = `Corn: ${cornCount}`;
+            }
             break;
     }
   });
@@ -621,6 +715,10 @@ function animate() {
   const delta = clock.getDelta();
   if (mixer) mixer.update(delta);
 
+  const messageDisplay = document.getElementById('messageDisplay'); // Get the top message display element
+  const controlsMessageDisplay = document.getElementById('controlsMessageDisplay'); // NEW: Get the controls message display element
+  const cultivateMessageDisplay = document.getElementById('cultivateMessageDisplay'); // Get the new cultivate message display element
+
   if (man) {
     const key = controls.key;
     const rotate = controls.rotate;
@@ -630,27 +728,27 @@ function animate() {
     let targetAnimation = active ? (key[2] ? 'Run' : 'Walk') : 'Idle';
 
     if (controls.current !== 'SwordSlash' && controls.current !== targetAnimation) {
-        setAnimation(targetAnimation);
+      setAnimation(targetAnimation);
     }
 
     if (controls.current !== 'Idle' && controls.current !== 'SwordSlash') {
-        const velocity = controls.current === 'Run' ? controls.runVelocity : controls.walkVelocity;
+      const velocity = controls.current === 'Run' ? controls.runVelocity : controls.walkVelocity;
 
-        // Update man's position
-        man.position.x += key[1] * velocity * delta;
+      // Update man's position
+      man.position.x += key[1] * velocity * delta;
 
-        // Clamp man's x position within the specified range
-        man.position.x = Math.max(minX, Math.min(maxX, man.position.x));
+      // Clamp man's x position within the specified range
+      man.position.x = Math.max(minX, Math.min(maxX, man.position.x));
 
-        let targetAngle = 0;
-        if (key[1] === 1) {
-            targetAngle = Math.PI / 2;
-        } else if (key[1] === -1) {
-            targetAngle = -Math.PI / 2;
-        }
-        rotate.setFromAxisAngle(up, targetAngle);
+      let targetAngle = 0;
+      if (key[1] === 1) {
+        targetAngle = Math.PI / 2;
+      } else if (key[1] === -1) {
+        targetAngle = -Math.PI / 2;
+      }
+      rotate.setFromAxisAngle(up, targetAngle);
 
-        man.quaternion.slerp(rotate, controls.rotateSpeed * (delta * 60));
+      man.quaternion.slerp(rotate, controls.rotateSpeed * (delta * 60));
     }
 
     let cameraOffset = new THREE.Vector3(0, 50, 100);
@@ -661,16 +759,48 @@ function animate() {
     } else {
       camera.fov = THREE.MathUtils.lerp(camera.fov, initialCameraFOV, 0.05);
       camera.updateProjectionMatrix();
-
     }
 
     camera.position.set(
-        man.position.x + cameraOffset.x,
-        man.position.y + cameraOffset.y,
-        man.position.z + cameraOffset.z
+      man.position.x + cameraOffset.x,
+      man.position.y + cameraOffset.y,
+      man.position.z + cameraOffset.z
     );
 
     camera.lookAt(man.position.x, man.position.y + 1.5, man.position.z);
+
+    // --- Message Display Logic ---
+    let positionMessage = "";
+    // Adjusted ranges for smoother transitions and contiguity
+    if (man.position.x <= -30) { // Extended slightly to overlap or meet previous range
+      positionMessage = "There is a time in every man's education when he arrives at the conviction that envy is ignorance;\n that imitation is suicide";
+    } else if (man.position.x > -30 && man.position.x <= 30) { // Changed 23 to 30 for smoother transition
+      positionMessage = "Abandon all hope ye who travel on roads of insidious intent";
+    } else if (man.position.x > 30) { // Changed 33 to 30 for smoother transition
+      positionMessage = "Society everywhere is in conspiracy against the manhood of every one of its\nmembers.";
+    }
+
+    if (positionMessage) {
+        messageDisplay.textContent = positionMessage;
+        messageDisplay.style.display = 'block';
+    } else {
+        messageDisplay.style.display = 'none';
+    }
+
+    // Always display the controls message
+    controlsMessageDisplay.textContent = "Use A and D keys to move left and right. Press/hold Shift to sprint.";
+    controlsMessageDisplay.style.display = 'block';
+
+    // --- End Message Display Logic ---
+
+    // --- Cultivate Message Display Logic (Bottom Middle) ---
+    if (man.position.x <= -30) { // Adjusted to match the toil message range
+      cultivateMessageDisplay.textContent = "Press SPACE to cultivate corn!";
+      cultivateMessageDisplay.style.display = 'block';
+    } else {
+      cultivateMessageDisplay.style.display = 'none';
+    }
+    // --- End Cultivate Message Display Logic ---
   }
   renderer.render(scene, camera);
 }
