@@ -1,247 +1,658 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Underground Farm</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Serif:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mea+Culpa&display=swap" />
-  <style>
-    body {
-      font-family: 'Noto Serif', serif;
-      margin: 0;
-      overflow-x: hidden;
-      background-color: #1e1e1e;
-      color: #f0f0f0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      overflow: hidden;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Underground Farm</title>
 
-    #sceneCanvas {
-      display: none;
-    }
-
-    #quoteDisplay {
-      font-family: 'Mea+Culpa', cursive;
-      font-size: 3em;
-      margin-top: 50px;
-      margin-bottom: 40px;
-      white-space: pre-wrap;
-      overflow: visible;
-      text-align: center;
-      padding: 20px;
-      max-width: 80%;
-    }
-
-    .game-title {
-      font-family: 'Mea+Culpa', cursive;
-      font-size: 5em;
-      margin-bottom: 30px;
-      color: #5D76A9;
-      display: none;
-      text-align: center;
-      transform: translateY(50px);
-      opacity: 0;
-      transition: transform var(--hover-speed) ease-out, opacity var(--hover-speed) ease-out;
-    }
-
-    .start-button {
-      font-family: 'Noto+Serif', serif;
-      font-size: 1.2em;
-      padding: 15px 30px;
-      background-color: #333;
-      color: #f0f0f0;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s ease, transform var(--hover-speed) ease-out, opacity var(--hover-speed) ease-out;
-      display: none;
-      transform: translateY(50px);
-      opacity: 0;
-      margin-bottom: 50px;
-    }
-
-    .start-button:hover {
-      background-color: #555;
-    }
-
-    .animate-in {
-      transform: translateY(0);
-      opacity: 1;
-    }
-
-    .scroll-prompt {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 1em;
-      color: #aaa;
-      opacity: 0;
-      animation: scrollUpDown 1.5s infinite alternate ease-in-out;
-      display: none;
-    }
-
-    .arrow {
-      display: block;
-      margin: 0 auto;
-      width: 0;
-      height: 0;
-      border-left: 5px solid transparent;
-      border-right: 5px solid transparent;
-      border-top: 10px solid #aaa;
-      margin-bottom: 5px;
-    }
-
-    @keyframes scrollUpDown {
-      0% {
-        transform: translate(-50%, 0);
-        opacity: 0.5;
-      }
-      100% {
-        transform: translate(-50%, 10px);
-        opacity: 1;
-      }
-    }
-
-    #gameDescription {
-      font-size: 1.1em;
-      line-height: 1.6;
-      padding: 30px;
-      max-width: 70%;
-      text-align: center;
-      opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-      margin-top: 50px;
-    }
-
-    .description-visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  </style>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Serif:wght@400;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mea+Culpa&display=swap" />
+<style>
+body {
+  font-family: 'Noto Serif', serif;
+  margin: 0;
+  overflow-x: hidden;
+  background-color: #1e1e1e;
+  color: #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+}
+#sceneCanvas {
+  display: none;
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+#quoteDisplay {
+  font-family: 'Mea Culpa', cursive;
+  font-size: 3em;
+  margin-top: 50px;
+  margin-bottom: 40px;
+  white-space: pre-wrap;
+  overflow: visible;
+  text-align: center;
+  padding: 20px;
+  max-width: 80%;
+  position: relative;
+  z-index: 1;
+}
+.game-title {
+  font-family: 'Mea Culpa', cursive;
+  font-size: 5em;
+  margin-bottom: 30px;
+  color: #5D76A9;
+  display: none;
+  text-align: center;
+  transform: translateY(50px);
+  opacity: 0;
+  transition: transform var(--hover-speed) ease-out, opacity var(--hover-speed) ease-out;
+  position: relative;
+  z-index: 1;
+}
+.start-button {
+  font-family: 'Noto Serif', serif;
+  font-size: 1.2em;
+  padding: 15px 30px;
+  background-color: #333;
+  color: #f0f0f0;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform var(--hover-speed) ease-out, opacity var(--hover-speed) ease-out;
+  display: none;
+  transform: translateY(50px);
+  opacity: 0;
+  margin-bottom: 50px;
+  position: relative;
+  z-index: 1;
+}
+.start-button:hover {
+  background-color: #555;
+}
+.animate-in {
+  transform: translateY(0);
+  opacity: 1;
+}
+.scroll-prompt {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1em;
+  color: #aaa;
+  opacity: 0;
+  animation: scrollUpDown 1.5s infinite alternate ease-in-out;
+  display: none;
+  z-index: 1;
+}
+.arrow {
+  display: block;
+  margin: 0 auto;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 10px solid #aaa;
+  margin-bottom: 5px;
+}
+@keyframes scrollUpDown {
+  0% {
+    transform: translate(-50%, 0);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(-50%, 10px);
+    opacity: 1;
+  }
+}
+#gameDescription {
+  font-size: 1.1em;
+  line-height: 1.6;
+  padding: 30px;
+  max-width: 70%;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+  margin-top: 50px;
+  position: relative;
+  z-index: 1;
+}
+.description-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+#skipButton {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Noto Serif', serif;
+  font-size: 1em;
+  padding: 10px 20px;
+  background-color: #555;
+  color: #f0f0f0;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  z-index: 1000;
+  display: none;
+  transition: background-color 0.3s ease;
+}
+#skipButton:hover {
+  background-color: #777;
+}
+</style>
 </head>
 <body>
-  <canvas id="sceneCanvas"></canvas>
-  <div id="quoteDisplay"></div>
-  <h1 class="game-title">Underground Farm</h1>
-  <button class="start-button">Start Game</button>
-  <div class="scroll-prompt">
-    <div class="arrow"></div>
-    Scroll Down
-    <div class="arrow" style="transform: rotate(180deg); margin-top: 5px; margin-bottom: 0;"></div>
-  </div>
+<canvas id="sceneCanvas"></canvas>
+<div id="quoteDisplay"></div>
+<h1 class="game-title">Underground Farm</h1>
+<button class="start-button">Start Game</button>
+<div class="scroll-prompt">
+  <div class="arrow"></div>
+  Scroll Down
+  <div class="arrow" style="transform: rotate(180deg); margin-top: 5px; margin-bottom: 0;"></div>
+</div>
+<div id="gameDescription">
+<h2>About Underground Farm</h2>
+<p>Embark on a unique farming adventure deep beneath the surface! In Underground Farm, you'll cultivate strange and wonderful crops in the subterranean world. Manage your resources, expand your underground farm, and discover the secrets hidden in the depths.</p>
+<p>Explore different layers, encounter peculiar creatures, and trade your harvests.</p>
+</div>
+<button id="skipButton">Skip Animation</button>
+<script type="module">
+import * as THREE from 'https://cdn.skypack.dev/three@0.129.0';
+import { FBXLoader } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/FBXLoader.js";
+import { GLTFLoader } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/GLTFLoader.js";
+import { SkeletonUtils } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/utils/SkeletonUtils.js";
+import { Sky } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/objects/Sky.js';
 
-  <div id="gameDescription">
-    <h2>About Underground Farm</h2>
-    <p>Embark on a unique farming adventure deep beneath the surface! In Underground Farm, you'll cultivate strange and wonderful crops in the subterranean world. Manage your resources, expand your underground farm, and discover the secrets hidden in the depths.</p>
-    <p>Explore different layers, encounter peculiar creatures, and trade your harvests. Can you become the most successful underground farmer?</p>
-  </div>
+let scene, camera, renderer, grass, sky;
+let clock = new THREE.Clock();
 
-  <script>
-    import { FBXLoader } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/FBXLoader.js";
+const controls = {
+    key: [0, 0, 0],
+    ease: new THREE.Vector3(),
+    position: new THREE.Vector3(),
+    up: new THREE.Vector3(0, 1, 0),
+    rotate: new THREE.Quaternion(),
+    current: 'Idle',
+    fadeDuration: 0.2,
+    runVelocity: 50,
+    walkVelocity: 8,
+    rotateSpeed: 0.5,
+    floorDecale: 0,
+};
 
-    const quoteElement = document.getElementById('quoteDisplay');
-    const quoteText = `"No kernel of nourishing corn can come to him but through his toil bestowed on that plot of ground which is given to him to till..."\n - Ralph Waldo Emerson\n("Self-Reliance", ll.)`;
-    let textIndex = 0;
-    const typingSpeed = 80;
+let mixer = null;
+let man = null;
+let originalMan = null;
+let zoomAreaSphere = null;
 
-    const gameTitle = document.querySelector('.game-title');
-    const startButtonElement = document.querySelector('.start-button');
-    const gameDescription = document.getElementById('gameDescription');
-    const hoverSpeed = '0.7s';
-    let descriptionVisible = false;
+let actions = {};
+let previousAnimation = 'Idle';
 
-    document.documentElement.style.setProperty('--hover-speed', hoverSpeed);
+const initialCameraPosition = new THREE.Vector3(0, 50, 100);
+const initialCameraLookAt = new THREE.Vector3(0, 0, 0);
+const initialCameraFOV = 75;
 
-    function typeWriter() {
-      if (textIndex < quoteText.length) {
-        quoteElement.textContent += quoteText.charAt(textIndex);
-        textIndex++;
-        setTimeout(typeWriter, typingSpeed);
-      } else {
-        gameTitle.style.display = 'block';
-        startButtonElement.style.display = 'block';
-        
-        
-        void gameTitle.offsetWidth;
-        void startButtonElement.offsetWidth;
-        gameTitle.classList.add('animate-in');
-        startButtonElement.classList.add('animate-in');
-      }
-    }
+const zoomXCoordinateThreshold = 28;
+const zoomedCameraFOV = 40;
+const blackAreaRadius = 150;
 
-    typeWriter();
+// Define the boundaries for man's movement
+const minX = -40; // Minimum X coordinate
+const maxX = 65;  // Maximum X coordinate
 
-    const startButton = document.querySelector('.start-button');
-    const canvas = document.getElementById('sceneCanvas');
+const quoteElement = document.getElementById('quoteDisplay');
+const quoteText = `"No kernel of nourishing corn can come to him but through his toil bestowed on that plot of ground which is given to him to till..."
+ - Ralph Waldo Emerson
+("Self-Reliance", p.128)`;
+let textIndex = 0;
+const typingSpeed = 80;
+let typingTimeout;
 
-    startButton.addEventListener('click', () => {
-      quoteElement.style.display = 'none';
-      startButton.style.display = 'none';
-      gameTitle.style.display = 'none';
-      gameDescription.classList.remove('description-visible');
-      descriptionVisible = false;
-      canvas.style.display = 'block';
-      init();
-      animate();
+const gameTitle = document.querySelector('.game-title');
+const startButton = document.querySelector('.start-button');
+const skipBtn = document.getElementById('skipButton');
+
+const hoverSpeed = '0.7s';
+document.documentElement.style.setProperty('--hover-speed', hoverSpeed);
+
+function typeWriter() {
+  if (textIndex < quoteText.length) {
+    quoteElement.textContent += quoteText.charAt(textIndex);
+    textIndex++;
+    typingTimeout = setTimeout(typeWriter, typingSpeed);
+  } else {
+    animationDone();
+  }
+}
+
+function animationDone() {
+  skipBtn.style.display = 'none';
+  gameTitle.style.display = 'block';
+  startButton.style.display = 'block';
+  void gameTitle.offsetWidth;
+  void startButton.offsetWidth;
+  gameTitle.classList.add('animate-in');
+  startButton.classList.add('animate-in');
+}
+
+skipBtn.style.display = 'block';
+typeWriter();
+
+skipBtn.addEventListener('click', () => {
+  clearTimeout(typingTimeout);
+  quoteElement.textContent = quoteText;
+  textIndex = quoteText.length;
+  animationDone();
+});
+
+startButton.addEventListener('click', () => {
+  quoteElement.style.display = 'none';
+  startButton.style.display = 'none';
+  gameTitle.style.display = 'none';
+  document.getElementById('gameDescription').style.display = 'none';
+  document.getElementById('sceneCanvas').style.display = 'block';
+
+  init();
+  addEventListeners();
+});
+
+async function init() {
+  scene = new THREE.Scene();
+
+  camera = new THREE.PerspectiveCamera(initialCameraFOV, window.innerWidth / window.innerHeight, 0.1, 2000);
+  camera.position.copy(initialCameraPosition);
+  camera.lookAt(initialCameraLookAt);
+
+  // Add ambient, hemisphere, and directional lights
+  const ambientLight = new THREE.AmbientLight(0x404040, 1.5); // Increased intensity
+  scene.add(ambientLight);
+
+  const hemisphereLight = new THREE.HemisphereLight(0xADD8E6, 0x303030, 0.8); // Sky color, ground color, intensity
+  scene.add(hemisphereLight);
+
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5); // Increased intensity
+  directionalLight.position.set(50, 100, 50); // Set a strong directional light position
+  directionalLight.castShadow = true; // Enable shadows for this light
+  directionalLight.shadow.mapSize.width = 2048; // Higher resolution shadows
+  directionalLight.shadow.mapSize.height = 2048;
+  directionalLight.shadow.camera.near = 0.5;
+  directionalLight.shadow.camera.far = 500;
+  directionalLight.shadow.camera.left = -100;
+  directionalLight.shadow.camera.right = 100;
+  directionalLight.shadow.camera.top = 100;
+  directionalLight.shadow.camera.bottom = -100;
+  scene.add(directionalLight);
+
+  renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('sceneCanvas'), antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.shadowMap.enabled = true; // Enable shadow mapping
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap; // Softer shadows
+
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 0.8; // Adjusted exposure for brighter scene
+
+  window.addEventListener('resize', onWindowResize);
+
+const sky = new Sky();
+sky.scale.setScalar(20000);
+scene.add(sky);
+const skyUniforms = sky.material.uniforms;
+skyUniforms['turbidity'].value = 1;
+skyUniforms['rayleigh'].value = 0.5;
+skyUniforms['mieCoefficient'].value = 0.005;
+skyUniforms['mieDirectionalG'].value = 0.5;
+
+const parameters = {
+    elevation: 2,
+    azimuth: 180
+};
+const sun = new THREE.Vector3();
+const phi = THREE.MathUtils.degToRad( 90 - parameters.elevation );
+const theta = THREE.MathUtils.degToRad( parameters.azimuth );
+sun.setFromSphericalCoords(10, phi, theta);
+sky.material.uniforms['sunPosition'].value.copy(sun);
+
+  directionalLight.position.copy(sun).normalize().multiplyScalar(100);
+
+  const geo = new THREE.PlaneGeometry(1000, 1000);
+  // Consider a material that reflects light better
+  const mat = new THREE.MeshStandardMaterial({ color: 0x556B2F, side: THREE.DoubleSide }); // Darker green for ground
+  grass = new THREE.Mesh(geo, mat);
+  grass.rotation.x = Math.PI / 2;
+  grass.position.y = -30;
+  grass.receiveShadow = true; // Grass should receive shadows
+  scene.add(grass);
+
+  const wal = new THREE.PlaneGeometry(75, 40);
+  const material = new THREE.MeshStandardMaterial({ color: 0x808080, side: THREE.DoubleSide }); // Standard material for walls
+  let wall = new THREE.Mesh(wal, material);
+  wall.rotation.x = 0;
+  wall.position.set(65,47,-235)
+  wall.receiveShadow = true; // Walls should receive shadows
+  scene.add(wall);
+
+  const wal1 = new THREE.PlaneGeometry(35, 40);
+  const material1 = new THREE.MeshStandardMaterial({ color: 0x808080, side: THREE.DoubleSide }); // Standard material for walls
+  let wall1 = new THREE.Mesh(wal1, material1);
+  wall1.rotation.x = 0;
+  wall1.rotation.y = Math.PI/2;
+  wall1.position.set(104,50,-220)
+  wall1.receiveShadow = true; // Walls should receive shadows
+  scene.add(wall1);
+
+  const fbxLoader = new FBXLoader();
+  const gltfLoader = new GLTFLoader();
+
+  try{
+    const glb = await gltfLoader.loadAsync('/bed.glb')
+    let bed = glb.scene
+    bed.scale.setScalar(8)
+    bed.position.set(90, 32, -230)
+    bed.traverse((node) => { if (node.isMesh) node.castShadow = true; }); // Cast shadows for bed
+    scene.add(bed)
+  }catch(e){
+    console.log(e)
+  }
+
+  try{
+    const glb = await gltfLoader.loadAsync('/corn.glb')
+    const originalCorn = glb.scene;
+    const cornScale = new THREE.Vector3(0.2, 0.4, 0.2); // Define the desired scale for all corn models
+
+    // Array of positions for the 8 corn models
+    const cornPositions = [
+        new THREE.Vector3(-50, 30, -214),
+        new THREE.Vector3(-50, 30, -218),
+        new THREE.Vector3(-54, 30, -214),
+        new THREE.Vector3(-54, 30, -218),
+        new THREE.Vector3(-46, 30, -214),
+        new THREE.Vector3(-46, 30, -218),
+        new THREE.Vector3(-50, 30, -210),
+        new THREE.Vector3(-54, 30, -212),
+    ];
+
+    cornPositions.forEach(pos => {
+        const cornInstance = SkeletonUtils.clone(originalCorn); // Clone the original corn model
+        if (cornInstance) {
+            cornInstance.scale.copy(cornScale); // Apply the same scale to the cloned instance
+            cornInstance.position.copy(pos); // Set its unique position
+            cornInstance.traverse((node) => { if (node.isMesh) node.castShadow = true; }); // Cast shadows for corn
+            scene.add(cornInstance);
+        } else {
+            console.warn("Failed to clone corn model for one instance.");
+        }
     });
 
-    let camera, scene, renderer, grass;
-    let time = 0;
+  }catch(e){
+    console.log(e)
+  }
+  try {
+    const house = await fbxLoader.loadAsync('/houseFinal.fbx');
+    house.scale.set(0.125, 0.125, 0.125);
+    house.position.set(0, -50, -200);
+    house.traverse((node) => { if (node.isMesh) node.castShadow = true; }); // Cast shadows for house
+    scene.add(house);
+  } catch(e) {
+    console.error('Error loading house:', e);
+  }
 
-    function init() {
-      scene = new THREE.Scene();
-      scene.background = new THREE.Color('grey');
+  try {
+    const glb = await gltfLoader.loadAsync('/undergroundMan.glb');
+    originalMan = glb.scene;
 
-      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-      camera.position.set(35, 10, 0);
-      camera.lookAt(new THREE.Vector3(20, 4, 0));
-
-      const light = new THREE.DirectionalLight(0xffffff, 1);
-      light.position.set(1, 1, 1).normalize();
-      scene.add(light);
-
-      const ambientLight = new THREE.AmbientLight(0x404040);
-      scene.add(ambientLight);
-
-      const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1);
-      hemiLight.position.set(0, 100, 0);
-      scene.add(hemiLight);
-
-      renderer = new THREE.WebGLRenderer({ canvas: sceneCanvas });
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(window.devicePixelRatio);
-
-      const loader = new FBXLoader(); 
-
-      loader.load('/house.fbx', (fbx)=>{
-        fbx.scale.set(1,1,1)
-        fbx.position.set(0,0,0)
-        scene.add(fbx)
-      }, (error)=>{
-        console.log(error)
-      })
+    man = SkeletonUtils.clone(originalMan);
+    if (!man) {
+      console.error("Failed to clone the character model");
+      return;
     }
 
-    function onWindowResize() {
-      camera.aspect = window.innerWidth / window.innerHeight;
+    mixer = new THREE.AnimationMixer(man);
+
+    if (glb.animations && glb.animations.length > 0) {
+        glb.animations.forEach((clip) => {
+            if (clip.name.includes('Idle')) {
+                actions.Idle = mixer.clipAction(clip);
+            } else if (clip.name.includes('Walk')) {
+                actions.Walk = mixer.clipAction(clip);
+            } else if (clip.name === 'CharacterArmature|Run') {
+                actions.Run = mixer.clipAction(clip);
+            } else if (clip.name === 'CharacterArmature|Sword_Slash') {
+                actions.SwordSlash = mixer.clipAction(clip);
+                actions.SwordSlash.clampWhenFinished = true;
+                actions.SwordSlash.setLoop(THREE.LoopOnce);
+            }
+        });
+    }
+
+    try{
+      const glb = await gltfLoader.loadAsync('/street.glb');
+      let road = glb.scene
+      road.scale.setScalar(140,100,300);
+      road.position.set(0,-35,-240)
+      road.receiveShadow = true; // Roads should receive shadows
+      scene.add(road)
+
+    const glb1= await gltfLoader.loadAsync('/street.glb');
+       let road1 = glb1.scene
+      road1.scale.setScalar(140,100,300);
+      road1.position.set(-100,-35,-240)
+      road1.receiveShadow = true;
+      scene.add(road1)
+
+      const glb2= await gltfLoader.loadAsync('/street.glb');
+      let road2 = glb2.scene
+      road2.scale.setScalar(140,100,300);
+      road2.position.set(100,-35,-240)
+      road2.receiveShadow = true;
+      scene.add(road2)
+    }catch(e){console.log(e)}
+
+
+    for (const name in actions) {
+        actions[name].enabled = true;
+        actions[name].setEffectiveTimeScale(1);
+        if (name !== 'Idle') {
+            actions[name].setEffectiveWeight(0);
+        } else {
+            actions[name].setEffectiveWeight(1);
+        }
+    }
+
+    if (actions.Idle) {
+      actions.Idle.play();
+      controls.current = 'Idle';
+    }
+
+    man.scale.setScalar(10);
+    man.position.set(20, 32, -215);
+    man.traverse((node) => { if (node.isMesh) node.castShadow = true; }); // Man should cast shadows
+    scene.add(man);
+
+    const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
+    const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.BackSide, transparent: true, opacity: 0 });
+    zoomAreaSphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    zoomAreaSphere.scale.setScalar(blackAreaRadius);
+    scene.add(zoomAreaSphere);
+
+  } catch(e) {
+    console.error('Error loading character model:', e);
+  }
+
+  function createLamp(x, y, z) {
+
+      // Light source visual (glowing sphere)
+      const lightSphereGeometry = new THREE.SphereGeometry(0.00001, 16, 16);
+      const lightSphereMaterial = new THREE.MeshBasicMaterial({ color: 'white', emissive: 0xffffaa, emissiveIntensity: 100 });
+      const lightSphere = new THREE.Mesh(lightSphereGeometry, lightSphereMaterial);
+      lightSphere.position.set(x, y + 12, z);
+      scene.add(lightSphere);
+
+      // SpotLight - Adjusted for a more focused, realistic glow
+      const spotLight = new THREE.SpotLight(0xffffee, 50, 100, Math.PI * 0.3, 0.2, 5); // Color, intensity, distance, angle, penumbra, decay
+      spotLight.position.copy(lightSphere.position);
+      spotLight.target.position.set(x, y - 10, z); // Direct the spotlight downwards
+      spotLight.castShadow = true; // Lamps should cast shadows
+      spotLight.shadow.mapSize.width = 1024;
+      spotLight.shadow.mapSize.height = 1024;
+      scene.add(spotLight);
+      scene.add(spotLight.target); // It's important to add the target to the scene
+
+      // Optional: Helper to visualize the light (uncomment to see)
+      // const spotLightHelper = new THREE.SpotLightHelper(spotLight);
+      // scene.add(spotLightHelper);
+  }
+
+  // Add lamps to the scene
+  createLamp(70, 80, -210);
+  createLamp(-50, 80, -200);
+  createLamp(man.position.x - 10, man.position.y + 80, man.position.z - 10);
+
+  mixer.addEventListener('finished', onInteractionFinished);
+
+  animate();
+}
+
+function setAnimation(animationName) {
+    if (!actions[animationName]) {
+        console.warn(`Animation "${animationName}" not found.`);
+        return;
+    }
+    if (controls.current === animationName) {
+        return;
+    }
+
+    const currentAction = actions[animationName];
+    const oldAction = actions[controls.current];
+
+    if (oldAction && oldAction !== currentAction) {
+        oldAction.setEffectiveWeight(0);
+        currentAction.setEffectiveWeight(1);
+
+        oldAction.fadeOut(controls.fadeDuration);
+        currentAction.reset().fadeIn(controls.fadeDuration).play();
+    } else {
+        currentAction.reset().setEffectiveWeight(1).play();
+    }
+
+    if (animationName !== 'Idle' && oldAction && oldAction.getClip() && currentAction.getClip()) {
+        currentAction.time = oldAction.time * (currentAction.getClip().duration / oldAction.getClip().duration);
+    }
+
+    if (animationName !== 'SwordSlash') {
+        previousAnimation = controls.current;
+    }
+    controls.current = animationName;
+}
+
+
+function onWindowResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+function addEventListeners() {
+  window.addEventListener('keydown', (event) => {
+    switch (event.code) {
+        case 'KeyA': controls.key[1] = -1; break;
+        case 'KeyD': controls.key[1] = 1; break;
+        case 'ShiftLeft' : case 'ShiftRight' : controls.key[2] = 1; break;
+        case 'Space':
+            if (actions.SwordSlash && controls.current !== 'SwordSlash') {
+                setAnimation('SwordSlash');
+            }
+            break;
+    }
+  });
+
+  window.addEventListener('keyup', (event) => {
+    switch (event.code) {
+        case 'KeyA': controls.key[1] = 0; break;
+        case 'KeyD': controls.key[1] = 0; break;
+        case 'ShiftLeft' : case 'ShiftRight' : controls.key[2] = 0; break;
+        case 'Space':
+            break;
+    }
+  });
+}
+
+function onInteractionFinished(e) {
+    if (e.action === actions.SwordSlash) {
+        setAnimation(previousAnimation);
+    }
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  const delta = clock.getDelta();
+  if (mixer) mixer.update(delta);
+
+  if (man) {
+    const key = controls.key;
+    const rotate = controls.rotate;
+    const up = controls.up;
+
+    const active = key[1] !== 0;
+    let targetAnimation = active ? (key[2] ? 'Run' : 'Walk') : 'Idle';
+
+    if (controls.current !== 'SwordSlash' && controls.current !== targetAnimation) {
+        setAnimation(targetAnimation);
+    }
+
+    if (controls.current !== 'Idle' && controls.current !== 'SwordSlash') {
+        const velocity = controls.current === 'Run' ? controls.runVelocity : controls.walkVelocity;
+
+        // Update man's position
+        man.position.x += key[1] * velocity * delta;
+
+        // Clamp man's x position within the specified range
+        man.position.x = Math.max(minX, Math.min(maxX, man.position.x));
+
+        let targetAngle = 0;
+        if (key[1] === 1) {
+            targetAngle = Math.PI / 2;
+        } else if (key[1] === -1) {
+            targetAngle = -Math.PI / 2;
+        }
+        rotate.setFromAxisAngle(up, targetAngle);
+
+        man.quaternion.slerp(rotate, controls.rotateSpeed * (delta * 60));
+    }
+
+    let cameraOffset = new THREE.Vector3(0, 50, 100);
+
+    if (man.position.x > zoomXCoordinateThreshold || man.position.x < -zoomXCoordinateThreshold) {
+      camera.fov = THREE.MathUtils.lerp(camera.fov, zoomedCameraFOV, 0.05);
       camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
+    } else {
+      camera.fov = THREE.MathUtils.lerp(camera.fov, initialCameraFOV, 0.05);
+      camera.updateProjectionMatrix();
+
     }
 
-    function animate() {
-      requestAnimationFrame(animate);
-      time += 0.01;
+    camera.position.set(
+        man.position.x + cameraOffset.x,
+        man.position.y + cameraOffset.y,
+        man.position.z + cameraOffset.z
+    );
 
-      renderer.render(scene, camera);
-    }
-  </script>
+    camera.lookAt(man.position.x, man.position.y + 1.5, man.position.z);
+  }
+  renderer.render(scene, camera);
+}
+</script>
 </body>
 </html>
