@@ -329,7 +329,7 @@ sky.material.uniforms['sunPosition'].value.copy(sun);
 
   const geo = new THREE.PlaneGeometry(1000, 1000);
   // Consider a material that reflects light better
-  const mat = new THREE.MeshStandardMaterial({ color: 0x556B2F, side: THREE.DoubleSide }); // Darker green for ground
+  const mat = new THREE.MeshStandardMaterial({ color: '#383838', side: THREE.DoubleSide }); // Darker green for ground
   grass = new THREE.Mesh(geo, mat);
   grass.rotation.x = Math.PI / 2;
   grass.position.y = -30;
@@ -490,6 +490,27 @@ sky.material.uniforms['sunPosition'].value.copy(sun);
   } catch(e) {
     console.error('Error loading character model:', e);
   }
+
+  const loadHouse = (x, y, z, url, scale, angle) => {
+    gltfLoader.load(url, (glb) => {
+      let house = glb.scene; // Access the scene property of the loaded GLB
+      house.scale.setScalar(scale);
+      house.position.set(x, y, z);
+      house.rotation.y = angle; 
+      house.traverse((node) => {
+        if (node.isMesh) node.castShadow = true;
+      }); // Ensure the loaded model casts shadows
+      scene.add(house); // Add the loaded model to the scene
+    });
+  };
+
+
+loadHouse(0,-30,-340, 'building2.glb',20,0)
+loadHouse(-180,-30,-300, 'building1.glb',20,Math.PI/2)
+loadHouse(-180,-30,-200, 'building1.glb',20,Math.PI/2)
+loadHouse(-140,-30,-340, 'building3.glb',20,0)
+loadHouse(200,-30,-280, 'building2.glb',20,Math.PI/2)
+
 
   function createLamp(x, y, z) {
 
