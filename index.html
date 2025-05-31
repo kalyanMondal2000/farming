@@ -462,22 +462,7 @@ sky.material.uniforms['sunPosition'].value.copy(sun);
   grass.receiveShadow = true;
   scene.add(grass);
 
-  const wal = new THREE.PlaneGeometry(75, 40);
-  const material = new THREE.MeshStandardMaterial({ color: 0x808080, side: THREE.DoubleSide });
-  let wall = new THREE.Mesh(wal, material);
-  wall.rotation.x = 0;
-  wall.position.set(65,47,-235)
-  wall.receiveShadow = true;
-  scene.add(wall);
 
-  const wal1 = new THREE.PlaneGeometry(35, 40);
-  const material1 = new THREE.MeshStandardMaterial({ color: 0x808080, side: THREE.DoubleSide });
-  let wall1 = new THREE.Mesh(wal1, material1);
-  wall1.rotation.x = 0;
-  wall1.rotation.y = Math.PI/2;
-  wall1.position.set(104,50,-220)
-  wall1.receiveShadow = true;
-  scene.add(wall1);
 
   const fbxLoader = new FBXLoader();
   const gltfLoader = new GLTFLoader();
@@ -485,8 +470,9 @@ sky.material.uniforms['sunPosition'].value.copy(sun);
   try{
     const glb = await gltfLoader.loadAsync('models/bed.glb')
     let bed = glb.scene
-    bed.scale.setScalar(8)
-    bed.position.set(90, 32, -230)
+    bed.scale.setScalar(6)
+    bed.position.set(90, 32, -210)
+    bed.rotation.y = -Math.PI/2
     bed.traverse((node) => { if (node.isMesh) node.castShadow = true; });
     scene.add(bed)
   }catch(e){
@@ -805,7 +791,7 @@ function animate() {
       } else if (man.position.x > -30 && man.position.x <= 30) {
         positionMessage = "Abandon all hope ye who travel on roads of insidious intent";
       } else if (man.position.x > 30) {
-        positionMessage = "Society everywhere is in conspiracy against the manhood of every one of its\nmembers.";
+        positionMessage = "Liza! Liza!";
       }
 
       if (positionMessage) {
