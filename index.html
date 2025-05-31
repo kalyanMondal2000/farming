@@ -455,7 +455,7 @@ sky.material.uniforms['sunPosition'].value.copy(sun);
   const gltfLoader = new GLTFLoader();
 
   try{
-    const glb = await gltfLoader.loadAsync('/models/bed.glb')
+    const glb = await gltfLoader.loadAsync('models/bed.glb')
     let bed = glb.scene
     bed.scale.setScalar(8)
     bed.position.set(90, 32, -230)
@@ -466,7 +466,7 @@ sky.material.uniforms['sunPosition'].value.copy(sun);
   }
 
   try{
-    const glb = await gltfLoader.loadAsync('/models/corn.glb')
+    const glb = await gltfLoader.loadAsync('models/corn.glb')
     const originalCorn = glb.scene;
     const cornScale = new THREE.Vector3(0.2, 0.4, 0.2); 
 
@@ -497,7 +497,7 @@ sky.material.uniforms['sunPosition'].value.copy(sun);
     console.log(e)
   }
   try {
-    const house = await fbxLoader.loadAsync('/models/houseFinal.fbx');
+    const house = await fbxLoader.loadAsync('models/houseFinal.fbx');
     house.scale.set(0.125, 0.125, 0.125);
     house.position.set(0, -50, -200);
     house.traverse((node) => { if (node.isMesh) node.castShadow = true; }); 
@@ -507,7 +507,7 @@ sky.material.uniforms['sunPosition'].value.copy(sun);
   }
 
   try {
-    const glb = await gltfLoader.loadAsync('/models/undergroundMan.glb');
+    const glb = await gltfLoader.loadAsync('models/undergroundMan.glb');
     originalMan = glb.scene;
 
     man = SkeletonUtils.clone(originalMan);
@@ -535,21 +535,21 @@ sky.material.uniforms['sunPosition'].value.copy(sun);
     }
 
     try{
-      const glb = await gltfLoader.loadAsync('/models/street.glb');
+      const glb = await gltfLoader.loadAsync('models/street.glb');
       let road = glb.scene
       road.scale.setScalar(140,100,300);
       road.position.set(0,-35,-240)
       road.receiveShadow = true; 
       scene.add(road)
 
-    const glb1= await gltfLoader.loadAsync('/models/street.glb');
+    const glb1= await gltfLoader.loadAsync('models/street.glb');
        let road1 = glb1.scene
       road1.scale.setScalar(140,100,300);
       road1.position.set(-100,-35,-240)
       road1.receiveShadow = true;
       scene.add(road1)
 
-      const glb2= await gltfLoader.loadAsync('/models/street.glb');
+      const glb2= await gltfLoader.loadAsync('models/street.glb');
       let road2 = glb2.scene
       road2.scale.setScalar(140,100,300);
       road2.position.set(100,-35,-240)
@@ -602,11 +602,11 @@ sky.material.uniforms['sunPosition'].value.copy(sun);
   };
 
 
-loadHouse(0,-30,-340, '/models/building2.glb',20,0)
-loadHouse(-180,-30,-300, '/models/building1.glb',20,Math.PI/2)
-loadHouse(-180,-30,-200, '/models/building1.glb',20,Math.PI/2)
-loadHouse(-140,-30,-340, '/models/building3.glb',20,0)
-loadHouse(200,-30,-280, '/models/building2.glb',20,Math.PI/2)
+loadHouse(0,-30,-340, 'models/building2.glb',20,0)
+loadHouse(-180,-30,-300, 'models/building1.glb',20,Math.PI/2)
+loadHouse(-180,-30,-200, 'models/building1.glb',20,Math.PI/2)
+loadHouse(-140,-30,-340, 'models/building3.glb',20,0)
+loadHouse(200,-30,-280, 'models/building2.glb',20,Math.PI/2)
 
 
   function createLamp(x, y, z) {
