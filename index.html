@@ -306,12 +306,17 @@ const controls = {
     floorDecale: 0,
 };
 
-let mixer = null;
+let mixer = null; // Mixer for the main underground man character
 let man = null;
 let originalMan = null;
 let zoomAreaSphere = null;
 
-let actions = {};
+let manDanceMixer = null; // New mixer for manDance
+let manDanceActions = {}; // New actions object for manDance
+let womanDanceMixer = null; // New mixer for womanDance
+let womanDanceActions = {}; // New actions object for womanDance
+
+let actions = {}; // Existing actions for the main underground man character
 let previousAnimation = 'Idle';
 
 const initialCameraPosition = new THREE.Vector3(0, 50, 100);
@@ -519,6 +524,59 @@ sky.material.uniforms['sunPosition'].value.copy(sun);
   } catch(e) {
     console.error('Error loading house:', e);
   }
+
+  // --- Start of new code for manDance.fbx and womanDance.fbx with mixers ---
+  try {
+    const manDanceModel = await fbxLoader.loadAsync('models/manDance.fbx');
+    manDanceModel.scale.setScalar(0.1); // Adjust scale as needed
+    manDanceModel.position.set(0, -30, -230); // Adjust position as needed
+    manDanceModel.traverse((node) => { if (node.isMesh) node.castShadow = true; });
+    scene.add(manDanceModel);
+    console.log('Man Dance model loaded:', manDanceModel);
+
+    // Initialize mixer for manDance
+    manDanceMixer = new THREE.AnimationMixer(manDanceModel);
+    if (manDanceModel.animations && manDanceModel.animations.length > 0) {
+        // Assuming manDance.fbx has at least one animation.
+        // You might need to inspect the FBX to find the exact animation clip name.
+        // For simplicity, we'll just play the first animation found.
+        const clip = manDanceModel.animations[0];
+        const action = manDanceMixer.clipAction(clip);
+        action.play();
+        manDanceActions[clip.name] = action; // Store action if you need to control it later
+        console.log(`Playing animation: ${clip.name} for manDance`);
+    } else {
+        console.warn('No animations found for manDance.fbx');
+    }
+
+  } catch(e) {
+    console.error('Error loading manDance.fbx:', e);
+  }
+
+  try {
+    const womanDanceModel = await fbxLoader.loadAsync('models/womanDance.fbx');
+    womanDanceModel.scale.setScalar(0.1); // Adjust scale as needed
+    womanDanceModel.position.set(10, -30, -200); // Adjust position to be next to manDance
+    womanDanceModel.traverse((node) => { if (node.isMesh) node.castShadow = true; });
+    scene.add(womanDanceModel);
+    console.log('Woman Dance model loaded:', womanDanceModel);
+
+    // Initialize mixer for womanDance
+    womanDanceMixer = new THREE.AnimationMixer(womanDanceModel);
+    if (womanDanceModel.animations && womanDanceModel.animations.length > 0) {
+        const clip = womanDanceModel.animations[0];
+        const action = womanDanceMixer.clipAction(clip);
+        action.play();
+        womanDanceActions[clip.name] = action;
+        console.log(`Playing animation: ${clip.name} for womanDance`);
+    } else {
+        console.warn('No animations found for womanDance.fbx');
+    }
+
+  } catch(e) {
+    console.error('Error loading womanDance.fbx:', e);
+  }
+  // --- End of new code for manDance.fbx and womanDance.fbx with mixers ---
 
   try {
     const glb = await gltfLoader.loadAsync('models/undergroundMan.glb');
@@ -729,7 +787,11 @@ function onInteractionFinished(e) {
 function animate() {
   requestAnimationFrame(animate);
   const delta = clock.getDelta();
-  if (mixer) mixer.update(delta);
+
+  // Update all mixers
+  if (mixer) mixer.update(delta); // For the main underground man
+  if (manDanceMixer) manDanceMixer.update(delta); // For the manDance model
+  if (womanDanceMixer) womanDanceMixer.update(delta); // For the womanDance model
 
   const messageDisplay = document.getElementById('messageDisplay');
   const thoughtCircle1 = document.getElementById('thoughtCircle1');
