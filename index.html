@@ -846,14 +846,19 @@ function animate() {
 
     camera.lookAt(man.position.x, man.position.y + 1.5, man.position.z);
 
-    if (messageDisplay.style.display !== 'none') {
+    // --- MODIFICATION START ---
+    if (man.position.x > 30) {
+      // Hide thought bubbles, message box, and message text
+      messageDisplay.style.display = 'none';
+      thoughtCircle1.style.display = 'none';
+      thoughtCircle2.style.display = 'none';
+    } else {
+      // Logic for displaying messages based on x position (existing code)
       let positionMessage = "";
       if (man.position.x <= -30) {
         positionMessage = "no kernel of nourishing corn can come to him but through his toil bestowed on that plot of ground which is given to him to till.";
       } else if (man.position.x > -30 && man.position.x <= 30) {
         positionMessage = "Abandon all hope ye who travel on roads of insidious intent";
-      } else if (man.position.x > 30) {
-        positionMessage = "Liza! Liza!";
       }
 
       if (positionMessage) {
@@ -861,7 +866,6 @@ function animate() {
           messageDisplay.style.display = 'flex';
           thoughtCircle1.style.display = 'block';
           thoughtCircle2.style.display = 'block';
-
 
           const vector = new THREE.Vector3();
           man.getWorldPosition(vector);
@@ -871,16 +875,15 @@ function animate() {
           const y = (-vector.y * 0.5 + 0.5) * window.innerHeight;
 
           const messageContainer = document.getElementById('messageContainer');
-          // Adjust messageContainer's position to place the bubble above and slightly to the side of the character
-          messageContainer.style.left = `${x - 120}px`; // Moved more to the left relative to char's screen x
-          messageContainer.style.top = `${y - messageDisplay.offsetHeight - 90}px`; // Moved further up
-
+          messageContainer.style.left = `${x - 120}px`;
+          messageContainer.style.top = `${y - messageDisplay.offsetHeight - 90}px`;
       } else {
           messageDisplay.style.display = 'none';
           thoughtCircle1.style.display = 'none';
           thoughtCircle2.style.display = 'none';
       }
     }
+    // --- MODIFICATION END ---
 
 
     if (controlsMessageDisplay.style.display !== 'none') {
