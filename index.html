@@ -259,6 +259,42 @@ body {
 #skipButton:hover {
   background-color: #777;
 }
+
+/* --- Loading Bar Styles --- */
+#loadingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000; /* Ensure it's on top of everything */
+  color: white;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 1.5em;
+  display: none; /* Hidden by default */
+}
+
+#loadingBarContainer {
+  width: 50%;
+  height: 30px;
+  border: 2px solid #00ff00;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-top: 20px;
+  background-color: #333;
+}
+
+#loadingBarFill {
+  height: 100%;
+  width: 0%; /* Initial width */
+  background-color: #00ff00;
+  transition: width 0.1s linear; /* Smooth transition for the fill */
+}
 </style>
 </head>
 <body>
@@ -282,6 +318,14 @@ body {
   <div class="arrow" style="transform: rotate(180deg); margin-top: 5px; margin-bottom: 0;"></div>
 </div>
 <button id="skipButton">Skip Animation</button>
+
+<div id="loadingOverlay">
+  Loading...
+  <div id="loadingBarContainer">
+    <div id="loadingBarFill"></div>
+  </div>
+</div>
+
 <script type="module">
 import * as THREE from 'https://cdn.skypack.dev/three@0.129.0';
 import { FBXLoader } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/FBXLoader.js";
@@ -348,6 +392,10 @@ const gameTitle = document.querySelector('.game-title');
 const startButton = document.querySelector('.start-button');
 const skipBtn = document.getElementById('skipButton');
 
+// Loading Bar Elements
+const loadingOverlay = document.getElementById('loadingOverlay');
+const loadingBarFill = document.getElementById('loadingBarFill');
+
 const hoverSpeed = '0.7s';
 document.documentElement.style.setProperty('--hover-speed', hoverSpeed);
 
@@ -388,15 +436,29 @@ startButton.addEventListener('click', () => {
   startButton.style.display = 'none';
   gameTitle.style.display = 'none';
 
-  document.getElementById('sceneCanvas').style.display = 'block';
-  cornCounterDisplay.style.display = 'block';
-  messageDisplay.style.display = 'flex';
-  thoughtCircle1.style.display = 'block'; // Show circles
-  thoughtCircle2.style.display = 'block'; // Show circles
-  controlsMessageDisplay.style.display = 'block';
+  // Show the loading overlay
+  loadingOverlay.style.display = 'flex';
+  loadingBarFill.style.width = '0%'; // Reset loading bar
 
-  init();
-  addEventListeners();
+  // Simulate loading progress
+  let progress = 0;
+  const loadingInterval = setInterval(() => {
+    progress += 5; // Increment progress
+    loadingBarFill.style.width = `${progress}%`;
+    if (progress >= 100) {
+      clearInterval(loadingInterval);
+      // Once loading is complete, hide overlay and start game
+      loadingOverlay.style.display = 'none';
+      document.getElementById('sceneCanvas').style.display = 'block';
+      cornCounterDisplay.style.display = 'block';
+      messageDisplay.style.display = 'flex';
+      thoughtCircle1.style.display = 'block'; // Show circles
+      thoughtCircle2.style.display = 'block'; // Show circles
+      controlsMessageDisplay.style.display = 'block';
+      init();
+      addEventListeners();
+    }
+  }, 100); // Update every 100ms
 });
 
 async function init() {
