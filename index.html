@@ -276,7 +276,7 @@ body {
   color: white;
   font-family: 'Press Start 2P', cursive;
   font-size: 1.5em;
-  display: none; /* Hidden by default */
+  display: none; /* Hidden by default, will be shown by JS */
 }
 
 #loadingBarContainer {
@@ -368,7 +368,7 @@ const initialCameraLookAt = new THREE.Vector3(0, 0, 0);
 const initialCameraFOV = 75;
 
 const zoomXCoordinateThreshold = 28;
-const zoomedCameraFOV = 40;
+const zoomedCameraFOV = 50;
 const blackAreaRadius = 150;
 
 const minX = -40;
@@ -436,29 +436,12 @@ startButton.addEventListener('click', () => {
   startButton.style.display = 'none';
   gameTitle.style.display = 'none';
 
-  // Show the loading overlay
+  // Show the loading overlay when starting to load models
   loadingOverlay.style.display = 'flex';
-  loadingBarFill.style.width = '0%'; // Reset loading bar
+  loadingBarFill.style.width = '0%'; // Reset loading bar to 0%
 
-  // Simulate loading progress
-  let progress = 0;
-  const loadingInterval = setInterval(() => {
-    progress += 5; // Increment progress
-    loadingBarFill.style.width = `${progress}%`;
-    if (progress >= 100) {
-      clearInterval(loadingInterval);
-      // Once loading is complete, hide overlay and start game
-      loadingOverlay.style.display = 'none';
-      document.getElementById('sceneCanvas').style.display = 'block';
-      cornCounterDisplay.style.display = 'block';
-      messageDisplay.style.display = 'flex';
-      thoughtCircle1.style.display = 'block'; // Show circles
-      thoughtCircle2.style.display = 'block'; // Show circles
-      controlsMessageDisplay.style.display = 'block';
-      init();
-      addEventListeners();
-    }
-  }, 100); // Update every 100ms
+  // Call init to start loading assets
+  init();
 });
 
 async function init() {
@@ -529,25 +512,54 @@ sky.material.uniforms['sunPosition'].value.copy(sun);
   grass.receiveShadow = true;
   scene.add(grass);
 
+  // --- Loading Manager Setup ---
+  // Create a loading manager to track the progress of all assets
+  const manager = new THREE.LoadingManager();
 
+  // Callback function for progress updates
+  manager.onProgress = (url, itemsLoaded, itemsTotal) => {
+      const progress = (itemsLoaded / itemsTotal) * 100;
+      loadingBarFill.style.width = `${progress}%`; // Update the loading bar width
+  };
 
-  const fbxLoader = new FBXLoader();
-  const gltfLoader = new GLTFLoader();
+  // Callback function when all assets are loaded
+  manager.onLoad = () => {
+      // Once loading is complete, hide the loading overlay
+      loadingOverlay.style.display = 'none';
+      // Show the main game canvas and other UI elements
+      document.getElementById('sceneCanvas').style.display = 'block';
+      cornCounterDisplay.style.display = 'block';
+      messageDisplay.style.display = 'flex';
+      thoughtCircle1.style.display = 'block'; // Show circles
+      thoughtCircle2.style.display = 'block'; // Show circles
+      controlsMessageDisplay.style.display = 'block';
+      addEventListeners(); // Add game event listeners
+      animate(); // Start the animation loop after everything is loaded
+  };
+
+  // Callback function for loading errors
+  manager.onError = (url) => {
+      console.error('There was an error loading ' + url);
+  };
+
+  // Pass the manager to your loaders so they report their progress
+  const fbxLoader = new FBXLoader(manager);
+  const gltfLoader = new GLTFLoader(manager);
 
   try{
-    const glb = await gltfLoader.loadAsync('models/bed.glb')
-    let bed = glb.scene
-    bed.scale.setScalar(6)
-    bed.position.set(90, 32, -210)
-    bed.rotation.y = -Math.PI/2
+    const glb = await gltfLoader.loadAsync('models/bed.glb');
+    let bed = glb.scene;
+    bed.scale.setScalar(6);
+    bed.position.set(90, 32, -210);
+    bed.rotation.y = -Math.PI/2;
     bed.traverse((node) => { if (node.isMesh) node.castShadow = true; });
-    scene.add(bed)
+    scene.add(bed);
   }catch(e){
-    console.log(e)
+    console.log(e);
   }
 
   try{
-    const glb = await gltfLoader.loadAsync('models/corn.glb')
+    const glb = await gltfLoader.loadAsync('models/corn.glb');
     const originalCorn = glb.scene;
     const cornScale = new THREE.Vector3(0.2, 0.4, 0.2);
 
@@ -575,7 +587,7 @@ sky.material.uniforms['sunPosition'].value.copy(sun);
     });
 
   }catch(e){
-    console.log(e)
+    console.log(e);
   }
   try {
     const house = await fbxLoader.loadAsync('models/houseFinal.fbx');
@@ -670,26 +682,26 @@ sky.material.uniforms['sunPosition'].value.copy(sun);
 
     try{
       const glb = await gltfLoader.loadAsync('models/street.glb');
-      let road = glb.scene
+      let road = glb.scene;
       road.scale.setScalar(140,100,300);
-      road.position.set(0,-35,-240)
+      road.position.set(0,-35,-240);
       road.receiveShadow = true;
-      scene.add(road)
+      scene.add(road);
 
     const glb1= await gltfLoader.loadAsync('models/street.glb');
-       let road1 = glb1.scene
+       let road1 = glb1.scene;
       road1.scale.setScalar(140,100,300);
-      road1.position.set(-100,-35,-240)
+      road1.position.set(-100,-35,-240);
       road1.receiveShadow = true;
-      scene.add(road1)
+      scene.add(road1);
 
       const glb2= await gltfLoader.loadAsync('models/street.glb');
-      let road2 = glb2.scene
+      let road2 = glb2.scene;
       road2.scale.setScalar(140,100,300);
-      road2.position.set(100,-35,-240)
+      road2.position.set(100,-35,-240);
       road2.receiveShadow = true;
-      scene.add(road2)
-    }catch(e){console.log(e)}
+      scene.add(road2);
+    }catch(e){console.log(e);}
 
 
     for (const name in actions) {
@@ -722,6 +734,7 @@ sky.material.uniforms['sunPosition'].value.copy(sun);
     console.error('Error loading character model:', e);
   }
 
+  // Modified loadHouse to use the manager
   const loadHouse = (x, y, z, url, scale, angle) => {
     gltfLoader.load(url, (glb) => {
       let house = glb.scene;
@@ -735,12 +748,11 @@ sky.material.uniforms['sunPosition'].value.copy(sun);
     });
   };
 
-
-loadHouse(0,-30,-340, 'models/building2.glb',20,0)
-loadHouse(-180,-30,-300, 'models/building1.glb',20,Math.PI/2)
-loadHouse(-180,-30,-200, 'models/building1.glb',20,Math.PI/2)
-loadHouse(-140,-30,-340, 'models/building3.glb',20,0)
-loadHouse(200,-30,-280, 'models/building2.glb',20,Math.PI/2)
+loadHouse(0,-30,-340, 'models/building2.glb',20,0);
+loadHouse(-180,-30,-300, 'models/building1.glb',20,Math.PI/2);
+loadHouse(-180,-30,-200, 'models/building1.glb',20,Math.PI/2);
+loadHouse(-140,-30,-340, 'models/building3.glb',20,0);
+loadHouse(200,-30,-280, 'models/building2.glb',20,Math.PI/2);
 
 
   function createLamp(x, y, z) {
@@ -768,8 +780,6 @@ loadHouse(200,-30,-280, 'models/building2.glb',20,Math.PI/2)
   mixer.addEventListener('finished', onInteractionFinished);
 
   cornCounterDisplay.textContent = `Corn: ${cornCount}`;
-
-  animate();
 }
 
 function setAnimation(animationName) {
